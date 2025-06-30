@@ -1,66 +1,54 @@
-# Unity Async Bridge
+Unity Async Bridge
+Overview
+Унифицированный интерфейс для асинхронных операций в Unity, поддерживающий как стандартные Task, так и UniTask с автоматическим выбором реализации в зависимости от платформы.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)  
-![Unity Version](https://img.shields.io/badge/Unity-2020.3+-black.svg)
+Key Features
+Кросс-платформенная работа (включая WebGL через UniTask)
 
-Unified async API for cross-platform Unity projects.
+Поддержка отмены операций через CancellationToken
 
-## Documentation
-- [Installation](Documentation/Installation.md)
-- [Usage Examples](Documentation/Usage.md)
-- [API Reference](Documentation/API.md)
-- [Platform Support](Documentation/Platforms.md)
+Единый интерфейс для await-паттерна
 
-## License
-See [LICENSE.md](LICENSE.md)
+Централизованная обработка ошибок
 
-# Installation
+Core Components
+IAsyncOperation Interface
+Базовый интерфейс асинхронной операции с методами:
 
-## Dependencies
-- **UniTask** (required for WebGL):
-  ```sh
-  https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask
+IsCompleted - проверка завершения
 
-  
----
+OnCompleted - регистрация продолжения
 
-### 3. **Usage.md** (`/Documentation/Usage.md`)
-```markdown
-# Usage Examples
+GetResult - получение результата
 
-## Basic Operation
-```csharp
-// Task example
-var operation = AsyncOperationFactory.Create(async (ct) => 
-{
-    await Task.Delay(1000, ct);
-});
+Cancel - отмена операции
 
+AsyncOperationBase
+Абстрактный базовый класс, реализующий:
 
----
+Механизм отмены через CancellationTokenSource
 
-### 4. **API.md** (`/Documentation/API.md`)
-```markdown
-# API Reference
+Хранение состояния выполнения
 
-## Interfaces
-| Interface | Description |
-|-----------|-------------|
-| `IAsyncOperation` | Core awaitable contract |
+Базовую логику продолжений
 
-## Factory
-```csharp
-// For Task
-Create(Func<CancellationToken, Task>)
+Platform Implementations
+TaskAsyncOperation - реализация для стандартных Task
 
+UniTaskAsyncOperation - реализация для UniTask (WebGL)
 
----
+AsyncOperationFactory
+Фабрика для создания экземпляров с автоматическим выбором реализации:
 
-### 5. **Platforms.md** (`/Documentation/Platforms.md`)
-```markdown
-# Platform Support
+Определяет платформу через директивы компиляции
 
-| Platform | Implementation |
-|----------|----------------|
-| WebGL    | UniTask        |
-| Others   | Task           |
+Предоставляет единую точку создания операций
+
+Platform Support
+Платформа	Реализация
+WebGL	UniTask
+Все другие	Стандартный Task
+Requirements
+Unity 2020.3+
+
+UniTask (только для WebGL-сборок)
