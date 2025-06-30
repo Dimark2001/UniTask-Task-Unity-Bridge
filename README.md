@@ -1,94 +1,34 @@
-A lightweight abstraction layer for seamless async operations in Unity, supporting both Task (C#) and UniTask (Cysharp) with automatic platform detection.
+# Unity Async Bridge
+**Unified Task/UniTask Operations for Cross-Platform Unity Projects**  
 
-✔ Works in WebGL (via UniTask)
-✔ Cancellation support
-✔ Error handling
-✔ Awaitable interface
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
+![Unity Version](https://img.shields.io/badge/Unity-2020.3+-black.svg)  
 
-Installation
-Dependencies
-UniTask (Required for WebGL)
+## Table of Contents
+1. [Overview](#overview)  
+2. [Installation](#installation)  
+   - [Dependencies](#dependencies)  
+   - [Manual Setup](#manual-setup)  
+3. [Usage](#usage)  
+   - [Basic Async Operation](#1-basic-async-operation)  
+   - [Cancellable Service](#2-cancellable-service)  
+4. [API Reference](#api-reference)  
+5. [Platform Notes](#platform-notes)  
+6. [License](#license)  
 
-sh
-# Install via UPM (Unity Package Manager)
-https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask
-Manual Setup
-Clone this repository into your Unity project’s Assets/Scripts/ folder.
+## Overview
+Lightweight abstraction layer for seamless async operations in Unity, supporting both **Task (C#)** and **UniTask (Cysharp)** with automatic platform detection.  
 
-Ensure the UNITASK_AVAILABLE symbol is defined if using UniTask.
+Key Features:  
+✔ WebGL support (via UniTask)  
+✔ Cancellation support  
+✔ Unified error handling  
+✔ Awaitable interface  
 
-Usage
-1. Basic Async Operation
-csharp
-using UnityEngine;
-using System.Threading;
+## Installation
 
-public class Example : MonoBehaviour
-{
-    private async void Start()
-    {
-        var operation = AsyncOperationFactory.Create(async (ct) =>
-        {
-            await Task.Delay(1000, ct); // Or UniTask.Delay(1000, ct)
-            Debug.Log("Operation completed!");
-        });
-
-        try
-        {
-            await operation; // Uses IAsyncOperation's GetAwaiter()
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Failed: {ex.Message}");
-        }
-    }
-}
-2. Cancellable Service
-csharp
-public class WeatherService : IPluginService
-{
-    public IAsyncOperation FetchDataAsync(CancellationToken ct)
-    {
-        return AsyncOperationFactory.Create(async (token) =>
-        {
-            await UniTask.Delay(1500, cancellationToken: token); // Simulate API call
-            return "Sunny"; // (In real code, return JSON/data)
-        });
-    }
-}
-
-// Usage:
-CancellationTokenSource _cts = new CancellationTokenSource();
-
-async void LoadWeather()
-{
-    var service = new WeatherService();
-    var operation = service.FetchDataAsync(_cts.Token);
-
-    try { Debug.Log(await operation); }
-    catch (OperationCanceledException) { Debug.Log("Cancelled!"); }
-}
-
-void Cancel() => _cts.Cancel(); // Call to abort
-API Reference
-Interfaces
-Interface	Description
-IAsyncOperation	Core async contract (awaitable, cancellable).
-IPluginService	Optional for service pattern (e.g., APIs).
-Factory
-csharp
-// For Task (non-WebGL):
-AsyncOperationFactory.Create(Func<CancellationToken, Task> taskFactory);
-
-// For UniTask (WebGL-friendly):
-AsyncOperationFactory.Create(Func<CancellationToken, UniTask> uniTaskFactory);
-Key Methods
-Method	Purpose
-GetResult()	Throws stored exceptions or returns result.
-Cancel()	Aborts the operation and cleans up resources.
-OnCompleted(Action)	Used by await for continuations.
-Platform Notes
-WebGL: Uses UniTask (auto-fallback via #if UNITY_WEBGL).
-
-Other Platforms: Uses standard Task for better performance.
-
+### Dependencies
+- **[UniTask](https://github.com/Cysharp/UniTask)** (Required for WebGL):  
+  ```sh
+  # Install via UPM
+  https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask
